@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'services/auth_service.dart';
+import 'views/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,36 +13,209 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
+
     return MaterialApp(
-      title: 'Controle de Veiculos',
+      title: 'Controle de Veículos',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      home: StreamBuilder(
+        stream: _authService.authStateChanges,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            final user = snapshot.data;
+            if (user == null) {
+              return const LoginPage();
+            } else {
+              return const AuthenticatedHome();
+            }
+          }
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        },
+      ),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-  final String title = 'Controle de Veiculos';
+class AuthenticatedHome extends StatefulWidget {
+  const AuthenticatedHome({super.key});
+
+  @override
+  State<AuthenticatedHome> createState() => _AuthenticatedHomeState();
+}
+
+class _AuthenticatedHomeState extends State<AuthenticatedHome> {
+  final _formKey = GlobalKey<FormState>();
+  final _modeloCtrl = TextEditingController();
+  final _marcaCtrl = TextEditingController();
+  final _placaCtrl = TextEditingController();
+  final _anoCtrl = TextEditingController();
+  final _combustivelCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final userEmail = AuthService().currentUser?.email ?? 'Usuário';
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Aplicativo de Veículos'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      appBar: AppBar(title: const Text('Controle de Veículos')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: const Text('Menu de Navegação'),
+              accountEmail: Text(userEmail),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, size: 40, color: Colors.deepPurple),
+              ),
+              decoration: const BoxDecoration(color: Colors.deepPurple),
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Sair'),
+              onTap: () async {
+                await AuthService().signOut();
+                Navigator.of(context).pop();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              },
+            ),
+          ],
+        ),
       ),
-      body: const Center(
-        child: Text(
-          'Firebase conectado com sucesso!',
-          style: TextStyle(fontSize: 18),
+
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Cadastrar Veículo',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                TextFormField(
+                  controller: _modeloCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Modelo',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Informe o modelo';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _marcaCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Marca',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Informe a marca';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16, width: 1),
+
+                TextFormField(
+                  controller: _placaCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Placa',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Informe a placa';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _anoCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Ano',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Informe o ano';
+                    if (int.tryParse(v) == null) return 'Digite um ano válido';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                Container(
+                  width: double.infinity,
+                  child: TextFormField(
+                    controller: _combustivelCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Tipo de Combustível',
+                      border: OutlineInputBorder(),
+                    ),
+
+                    validator: (v) {
+                      if (v == null || v.isEmpty) {
+                        return 'Informe o tipo de combustível';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 5),
+
+                ElevatedButton.icon(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Veículo cadastrado com sucesso!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      _modeloCtrl.clear();
+                      _marcaCtrl.clear();
+                      _placaCtrl.clear();
+                      _anoCtrl.clear();
+                      _combustivelCtrl.clear();
+                    }
+                  },
+                  icon: const Icon(Icons.save),
+                  label: const Text('Salvar Veículo'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
