@@ -29,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text.trim(),
       );
-      // authStateChanges vai redirecionar automaticamente no main
     } on FirebaseAuthException catch (e) {
       _showError(e.message ?? 'Erro no login');
     } catch (e) {

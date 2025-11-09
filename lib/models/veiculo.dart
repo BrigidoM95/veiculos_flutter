@@ -8,7 +8,7 @@ class Veiculo {
   String placa;
   int ano;
   String tipoCombustivel;
-  String ownerUid; // id do usuário dono
+  String ownerUid;
 
   Veiculo({
     this.id,
