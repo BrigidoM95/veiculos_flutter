@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:prova/models/veiculo.dart';
+import 'package:prova/views/veiculos_list.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'views/login_page.dart';
+import 'services/firestore_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +61,7 @@ class _AuthenticatedHomeState extends State<AuthenticatedHome> {
   final _placaCtrl = TextEditingController();
   final _anoCtrl = TextEditingController();
   final _combustivelCtrl = TextEditingController();
+  final FirestoreService _fs = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +81,24 @@ class _AuthenticatedHomeState extends State<AuthenticatedHome> {
                 child: Icon(Icons.person, size: 40, color: Colors.deepPurple),
               ),
               decoration: const BoxDecoration(color: Colors.deepPurple),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home, color: Colors.deepPurple),
+              title: const Text('Cadastrar Veículo'),
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const AuthenticatedHome()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Meus Veículos'),
+              onTap: () {
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => VeiculosListPage()));
+              },
             ),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
@@ -187,19 +209,48 @@ class _AuthenticatedHomeState extends State<AuthenticatedHome> {
                 const SizedBox(height: 5),
 
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Veículo cadastrado com sucesso!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      _modeloCtrl.clear();
-                      _marcaCtrl.clear();
-                      _placaCtrl.clear();
-                      _anoCtrl.clear();
-                      _combustivelCtrl.clear();
+                      try {
+                        final veiculo = Veiculo(
+                          modelo: _modeloCtrl.text.trim(),
+                          marca: _marcaCtrl.text.trim(),
+                          placa: _placaCtrl.text.trim(),
+                          ano: int.parse(_anoCtrl.text.trim()),
+                          tipoCombustivel: _combustivelCtrl.text.trim(),
+                          ownerUid: AuthService().currentUser!.uid,
+                        );
+                        await _fs.addVeiculo(veiculo);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Veículo cadastrado com sucesso!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        _modeloCtrl.clear();
+                        _marcaCtrl.clear();
+                        _placaCtrl.clear();
+                        _anoCtrl.clear();
+                        _combustivelCtrl.clear();
+
+                        await Future.delayed(
+                          const Duration(seconds: 05),
+                        ); // pequeno delay opcional
+                        if (context.mounted) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => const VeiculosListPage(),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Erro ao salvar: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                   icon: const Icon(Icons.save),

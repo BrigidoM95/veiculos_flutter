@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "358412713291",
-    "project_id": "flutter-projeto-e7179",
-    "storage_bucket": "flutter-projeto-e7179.firebasestorage.app"
+    "project_number": "675190007449",
+    "project_id": "flutter-controle-de-veiculos",
+    "storage_bucket": "flutter-controle-de-veiculos.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:358412713291:android:b2ed2787865ce06d82fcce",
+        "mobilesdk_app_id": "1:675190007449:android:46165ac1938cb4d47c7a08",
         "android_client_info": {
           "package_name": "com.example.prova"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBDh-_I8KlNL3KYtE6vU8mGH7RQqHYaiJg"
+          "current_key": "AIzaSyApmT90oq4KW3-oC5A5AR0bEwPV7u6Wxyg"
         }
       ],
       "services": {

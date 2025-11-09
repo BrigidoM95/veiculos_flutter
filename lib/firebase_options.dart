@@ -33,10 +33,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -50,20 +47,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyACeW1kerfY8ktf0_qbcGqWPW6dfVIbf2U',
-    appId: '1:358412713291:web:8db077e6416d59d582fcce',
-    messagingSenderId: '358412713291',
-    projectId: 'flutter-projeto-e7179',
-    authDomain: 'flutter-projeto-e7179.firebaseapp.com',
-    storageBucket: 'flutter-projeto-e7179.firebasestorage.app',
-    measurementId: 'G-836FXQ0TV0',
+    apiKey: 'AIzaSyAOm_We6ljgfiYL6-xXU2NOWpYwphUOLLM',
+    appId: '1:675190007449:web:53c24b0ff96589bc7c7a08',
+    messagingSenderId: '675190007449',
+    projectId: 'flutter-controle-de-veiculos',
+    authDomain: 'flutter-controle-de-veiculos.firebaseapp.com',
+    storageBucket: 'flutter-controle-de-veiculos.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBDh-_I8KlNL3KYtE6vU8mGH7RQqHYaiJg',
-    appId: '1:358412713291:android:b2ed2787865ce06d82fcce',
-    messagingSenderId: '358412713291',
-    projectId: 'flutter-projeto-e7179',
-    storageBucket: 'flutter-projeto-e7179.firebasestorage.app',
+    apiKey: 'AIzaSyApmT90oq4KW3-oC5A5AR0bEwPV7u6Wxyg',
+    appId: '1:675190007449:android:46165ac1938cb4d47c7a08',
+    messagingSenderId: '675190007449',
+    projectId: 'flutter-controle-de-veiculos',
+    storageBucket: 'flutter-controle-de-veiculos.firebasestorage.app',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAOm_We6ljgfiYL6-xXU2NOWpYwphUOLLM',
+    appId: '1:675190007449:web:ec43969db69ea23e7c7a08',
+    messagingSenderId: '675190007449',
+    projectId: 'flutter-controle-de-veiculos',
+    authDomain: 'flutter-controle-de-veiculos.firebaseapp.com',
+    storageBucket: 'flutter-controle-de-veiculos.firebasestorage.app',
+  );
+
 }
