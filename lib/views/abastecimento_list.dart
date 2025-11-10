@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:prova/main.dart';
-import '../services/firestore_service.dart';
-import '../models/veiculo.dart';
-import 'veiculo_edit.dart';
-import '../services/auth_service.dart';
-import 'login_page.dart';
-import 'cadastro_veiculos.dart';
+import 'package:prova/models/abastecimento_veiculo.dart';
+import 'package:prova/services/firestore_service.dart';
+import 'package:prova/views/abastecimento_edit.dart';
 import 'package:prova/views/abastecimento_cadastro.dart';
-import 'package:prova/views/abastecimento_list.dart';
+import 'package:prova/views/cadastro_veiculos.dart';
+import 'package:prova/views/veiculos_list.dart';
+import 'package:prova/views/login_page.dart';
+import 'package:prova/services/auth_service.dart';
+import 'package:prova/main.dart';
 
-class VeiculosListPage extends StatelessWidget {
-  const VeiculosListPage({super.key});
+class AbastecimentoListPage extends StatefulWidget {
+  const AbastecimentoListPage({super.key});
+
+  @override
+  State<AbastecimentoListPage> createState() => _AbastecimentoListPageState();
+}
+
+class _AbastecimentoListPageState extends State<AbastecimentoListPage> {
+  final FirestoreService _fs = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
-    final FirestoreService fs = FirestoreService();
+    final userEmail = AuthService().currentUser?.email ?? 'Usuário';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meus Veículos'),
-        backgroundColor: Colors.blueGrey,
+        title: const Text('Meus Abastecimentos'),
+        backgroundColor: Colors.lightBlueAccent,
       ),
       drawer: Drawer(
         child: ListView(
@@ -27,16 +34,16 @@ class VeiculosListPage extends StatelessWidget {
           children: [
             UserAccountsDrawerHeader(
               accountName: const Text('Menu de Navegação'),
-              accountEmail: Text(AuthService().currentUser?.email ?? ''),
+              accountEmail: Text(userEmail),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Colors.blueGrey),
+                child: Icon(Icons.person, size: 40, color: Colors.lightBlue),
               ),
-              decoration: const BoxDecoration(color: Colors.blueGrey),
+              decoration: const BoxDecoration(color: Colors.lightBlue),
             ),
             ListTile(
               leading: const Icon(Icons.home, color: Colors.deepPurple),
-              title: const Text('Inicio'),
+              title: const Text('Início'),
               onTap: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (_) => const AuthenticatedHome()),
@@ -61,9 +68,9 @@ class VeiculosListPage extends StatelessWidget {
               leading: const Icon(Icons.directions_car, color: Colors.blueGrey),
               title: const Text('Meus Veículos'),
               onTap: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (_) => VeiculosListPage()));
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const VeiculosListPage()),
+                );
               },
             ),
             ListTile(
@@ -96,6 +103,7 @@ class VeiculosListPage extends StatelessWidget {
               title: const Text('Sair'),
               onTap: () async {
                 await AuthService().signOut();
+                Navigator.of(context).pop();
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const LoginPage()),
                   (route) => false,
@@ -106,47 +114,65 @@ class VeiculosListPage extends StatelessWidget {
         ),
       ),
 
-      body: StreamBuilder<List<Veiculo>>(
-        stream: fs.streamVeiculos(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
+      body: StreamBuilder<List<Abastecimento>>(
+        stream: _fs.streamAbastecimentos(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          final list = snap.data ?? [];
-          if (list.isEmpty) {
-            return const Center(child: Text('Nenhum veículo cadastrado.'));
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                'Nenhum abastecimento encontrado.',
+                style: TextStyle(fontSize: 16),
+              ),
+            );
           }
+
+          final list = snapshot.data!;
           return ListView.separated(
             itemCount: list.length,
             separatorBuilder: (_, __) => const Divider(),
             itemBuilder: (context, i) {
-              final v = list[i];
+              final abast = list[i];
               return ListTile(
-                title: Text('${v.modelo} — ${v.marca}'),
+                leading: const Icon(
+                  Icons.local_gas_station,
+                  color: Colors.orange,
+                ),
+                title: Text(
+                  '${abast.tipoCombustivel} - ${abast.quantidadeLitros.toStringAsFixed(1)} L',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text(
-                  'Placa: ${v.placa} • Ano: ${v.ano} • ${v.tipoCombustivel}',
+                  'R\$ ${abast.valorPago.toStringAsFixed(2)} | '
+                  '${abast.quilometragem.toStringAsFixed(0)} km',
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.orange),
+                      tooltip: 'Editar abastecimento',
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => VeiculoEditPage(veiculo: v),
+                            builder: (_) =>
+                                AbastecimentoEditPage(abastecimento: abast),
                           ),
                         );
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
+                      tooltip: 'Excluir abastecimento',
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
                             title: const Text('Confirmar'),
-                            content: const Text('Excluir este veículo?'),
+                            content: const Text('Excluir este abastecimento?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
@@ -159,11 +185,17 @@ class VeiculosListPage extends StatelessWidget {
                             ],
                           ),
                         );
+
                         if (confirm == true) {
-                          await fs.deleteVeiculo(v.id!);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Veículo excluído')),
-                          );
+                          await _fs.deleteAbastecimento(abast.id!);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Abastecimento excluído'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       },
                     ),
@@ -171,14 +203,6 @@ class VeiculosListPage extends StatelessWidget {
                 ),
               );
             },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const CadastroVeiculosPage()),
           );
         },
       ),

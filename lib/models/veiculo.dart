@@ -1,4 +1,3 @@
-// lib/models/veiculo.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Veiculo {
