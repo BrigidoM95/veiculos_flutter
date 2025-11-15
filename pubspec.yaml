@@ -46,6 +46,7 @@ dependencies:
   firebase_database: ^10.5.7
   intl: ^0.18.1
   video_player: ^2.10.1
+  fl_chart: ^0.69.0
 
   
 

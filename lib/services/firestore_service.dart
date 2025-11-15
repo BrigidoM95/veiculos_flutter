@@ -9,7 +9,6 @@ class FirestoreService {
 
   String? get _uid => _auth.currentUser?.uid;
 
-  // ==================== VEÍCULOS ====================
   CollectionReference<Map<String, dynamic>> _veiculosRef(String uid) {
     return _db.collection('users').doc(uid).collection('veiculos');
   }
@@ -65,8 +64,6 @@ class FirestoreService {
     await _veiculosRef(uid).doc(id).delete();
   }
 
-  // ==================== ABASTECIMENTOS ====================
-
   CollectionReference<Map<String, dynamic>> _abastecimentosRef(String uid) {
     return _db.collection('users').doc(uid).collection('abastecimentos');
   }
@@ -113,5 +110,18 @@ class FirestoreService {
       'ownerUid': a.ownerUid,
       'updatedAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<List<Abastecimento>> getAbastecimentosPorVeiculo(
+    String veiculoId,
+  ) async {
+    final uid = _uid;
+    if (uid == null) return [];
+
+    final query = await _abastecimentosRef(
+      uid,
+    ).where('veiculoId', isEqualTo: veiculoId).orderBy('data').get();
+
+    return query.docs.map((doc) => Abastecimento.fromFirestore(doc)).toList();
   }
 }

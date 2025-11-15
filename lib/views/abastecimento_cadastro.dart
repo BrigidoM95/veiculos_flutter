@@ -9,6 +9,7 @@ import 'abastecimento_list.dart';
 import 'cadastro_veiculos.dart';
 import 'veiculos_list.dart';
 import 'login_page.dart';
+import 'package:prova/views/grafico_page.dart';
 
 final userEmail = AuthService().currentUser?.email ?? 'Usuário';
 
@@ -183,6 +184,16 @@ class _CadastroAbastecimentoPageState extends State<CadastroAbastecimentoPage> {
                   MaterialPageRoute(
                     builder: (_) => const AbastecimentoListPage(),
                   ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.show_chart, color: Colors.purple),
+              title: const Text("Gráfico de Consumo"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GraficoPage()),
                 );
               },
             ),

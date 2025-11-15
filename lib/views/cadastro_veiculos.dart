@@ -7,6 +7,7 @@ import 'login_page.dart';
 import '../main.dart';
 import 'package:prova/views/abastecimento_cadastro.dart';
 import 'package:prova/views/abastecimento_list.dart';
+import 'package:prova/views/grafico_page.dart';
 
 class CadastroVeiculosPage extends StatefulWidget {
   const CadastroVeiculosPage({super.key});
@@ -108,6 +109,16 @@ class _CadastroVeiculosPageState extends State<CadastroVeiculosPage> {
                   MaterialPageRoute(
                     builder: (_) => const AbastecimentoListPage(),
                   ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.show_chart, color: Colors.purple),
+              title: const Text("Gráfico de Consumo"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GraficoPage()),
                 );
               },
             ),

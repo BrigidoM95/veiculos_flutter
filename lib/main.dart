@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:prova/views/abastecimento_cadastro.dart';
 import 'package:prova/views/abastecimento_list.dart';
+import 'package:prova/views/grafico_page.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'views/login_page.dart';
@@ -128,6 +129,16 @@ class AuthenticatedHome extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => const AbastecimentoListPage(),
                   ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.show_chart, color: Colors.purple),
+              title: const Text("Gráfico de Consumo"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GraficoPage()),
                 );
               },
             ),
