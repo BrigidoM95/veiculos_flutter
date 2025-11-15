@@ -7,6 +7,7 @@ import 'services/auth_service.dart';
 import 'views/login_page.dart';
 import 'views/cadastro_veiculos.dart';
 import 'views/veiculos_list.dart';
+import 'views/video_home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +58,7 @@ class AuthenticatedHome extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Controle de Veículos'),
+        title: const Text('Bem vindo a Oficina Katchow'),
         backgroundColor: Colors.deepPurple,
       ),
       drawer: Drawer(
@@ -146,12 +147,7 @@ class AuthenticatedHome extends StatelessWidget {
           ],
         ),
       ),
-      body: const Center(
-        child: Text(
-          'Bem-vindo ao Sistema de Controle de Veículos!',
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
+      body: Stack(children: const [VideoBackground(), Center()]),
     );
   }
 }

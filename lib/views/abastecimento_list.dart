@@ -206,6 +206,16 @@ class _AbastecimentoListPageState extends State<AbastecimentoListPage> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const CadastroAbastecimentoPage(),
+            ),
+          );
+        },
+      ),
     );
   }
 }
